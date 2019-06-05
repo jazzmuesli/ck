@@ -4,6 +4,9 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Export metrics into 4 CSV files.
  *  
@@ -11,6 +14,7 @@ import java.util.Map;
  */
 public class CSVExporter {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(CSVExporter.class);
 	private static final String VARIABLE_FIELDS = "file,class,method,variable,usage";
 	private static final String FIELD_FIELDS = "file,class,method,variable,usage";
 	private static final String METHOD_FIELDS = "file,class,method,line,cbo,wmc,rfc,loc,returns,variables,parameters,startLine," +
@@ -55,80 +59,92 @@ public class CSVExporter {
 		new CK().calculate(path, result -> {
 			if(result.isError()) return;
 
+			String cLine = result.getFile() + delim +
+			result.getClassName() + delim +
+			result.getType() + delim +
+			result.getCbo() + delim +
+			result.getWmc() + delim +
+			result.getDit() + delim +
+			result.getRfc() + delim +
+			result.getLcom() + delim +
+			result.getNumberOfMethods() + delim +
+			result.getNumberOfStaticMethods() + delim +
+			result.getNumberOfPublicMethods() + delim +
+			result.getNumberOfPrivateMethods() + delim +
+			result.getNumberOfProtectedMethods() + delim +
+			result.getNumberOfDefaultMethods() + delim +
+			result.getNumberOfAbstractMethods() + delim +
+			result.getNumberOfFinalMethods() + delim +
+			result.getNumberOfSynchronizedMethods() + delim +
+			result.getNumberOfFields() + delim +
+			result.getNumberOfStaticFields() + delim +
+			result.getNumberOfPublicFields() + delim +
+			result.getNumberOfPrivateFields() + delim +
+			result.getNumberOfProtectedFields() + delim +
+			result.getNumberOfDefaultFields() + delim +
+			result.getNumberOfFinalFields() + delim +
+			result.getNumberOfSynchronizedFields() + delim +
+			result.getNosi() + delim +
+			result.getLoc() + delim +
+			result.getReturnQty() + delim +
+			result.getLoopQty() + delim +
+			result.getComparisonsQty() + delim +
+			result.getTryCatchQty() + delim +
+			result.getParenthesizedExpsQty() + delim +
+			result.getStringLiteralsQty() + delim +
+			result.getNumbersQty() + delim +
+			result.getAssignmentsQty() + delim +
+			result.getMathOperationsQty() + delim +
+			result.getVariablesQty() + delim +
+			result.getMaxNestedBlocks() + delim +
+			result.getAnonymousClassesQty() + delim +
+			result.getSubClassesQty() + delim +
+			result.getLambdasQty() + delim +
+			result.getUniqueWordsQty();
+			int nFields = cLine.split(delim).length;
+			if (nFields != 42) {
+				String msg = "Unusual num of fields: " + nFields + " on line " + cLine;
+				LOG.warn(msg);
+				System.out.println(msg);
+			}
+
 			classOutput.println(
-				result.getFile() + delim +
-				result.getClassName() + delim +
-				result.getType() + delim +
-				result.getCbo() + delim +
-				result.getWmc() + delim +
-				result.getDit() + delim +
-				result.getRfc() + delim +
-				result.getLcom() + delim +
-				result.getNumberOfMethods() + delim +
-				result.getNumberOfStaticMethods() + delim +
-				result.getNumberOfPublicMethods() + delim +
-				result.getNumberOfPrivateMethods() + delim +
-				result.getNumberOfProtectedMethods() + delim +
-				result.getNumberOfDefaultMethods() + delim +
-				result.getNumberOfAbstractMethods() + delim +
-				result.getNumberOfFinalMethods() + delim +
-				result.getNumberOfSynchronizedMethods() + delim +
-				result.getNumberOfFields() + delim +
-				result.getNumberOfStaticFields() + delim +
-				result.getNumberOfPublicFields() + delim +
-				result.getNumberOfPrivateFields() + delim +
-				result.getNumberOfProtectedFields() + delim +
-				result.getNumberOfDefaultFields() + delim +
-				result.getNumberOfFinalFields() + delim +
-				result.getNumberOfSynchronizedFields() + delim +
-				result.getNosi() + delim +
-				result.getLoc() + delim +
-				result.getReturnQty() + delim +
-				result.getLoopQty() + delim +
-				result.getComparisonsQty() + delim +
-				result.getTryCatchQty() + delim +
-				result.getParenthesizedExpsQty() + delim +
-				result.getStringLiteralsQty() + delim +
-				result.getNumbersQty() + delim +
-				result.getAssignmentsQty() + delim +
-				result.getMathOperationsQty() + delim +
-				result.getMathOperationsQty() + delim +
-				result.getVariablesQty() + delim +
-				result.getMaxNestedBlocks() + delim +
-				result.getAnonymousClassesQty() + delim +
-				result.getSubClassesQty() + delim +
-				result.getLambdasQty() + delim +
-				result.getUniqueWordsQty()
+				cLine
 			);
 
 			for(CKMethodResult method : result.getMethods()) {
-				methodOutput.println(
-					result.getFile() + delim +
-					result.getClassName() + delim +
-					method.getMethodName() + delim +
-					method.getStartLine() + delim +
-					method.getCbo() + delim +
-					method.getWmc() + delim +
-					method.getRfc() + delim +
-					method.getLoc() + delim +
-					method.getReturnQty() + delim +
-					method.getVariablesQty() + delim +
-					method.getParametersQty()  + delim +
-					method.getStartLine() + delim +
-					method.getLoopQty() + delim +
-					method.getComparisonsQty() + delim +
-					method.getTryCatchQty() + delim +
-					method.getParenthesizedExpsQty() + delim +
-					method.getStringLiteralsQty() + delim +
-					method.getNumbersQty() + delim +
-					method.getAssignmentsQty() + delim +
-					method.getMathOperationsQty() + delim +
-					method.getMaxNestedBlocks() + delim +
-					method.getAnonymousClassesQty() + delim +
-					method.getSubClassesQty() + delim +
-					method.getLambdasQty() + delim +
-					method.getUniqueWordsQty()
-				);
+				String line = result.getFile() + delim +
+				result.getClassName() + delim +
+				method.getMethodName() + delim +
+				method.getStartLine() + delim +
+				method.getCbo() + delim +
+				method.getWmc() + delim +
+				method.getRfc() + delim +
+				method.getLoc() + delim +
+				method.getReturnQty() + delim +
+				method.getVariablesQty() + delim +
+				method.getParametersQty()  + delim +
+				method.getStartLine() + delim +
+				method.getLoopQty() + delim +
+				method.getComparisonsQty() + delim +
+				method.getTryCatchQty() + delim +
+				method.getParenthesizedExpsQty() + delim +
+				method.getStringLiteralsQty() + delim +
+				method.getNumbersQty() + delim +
+				method.getAssignmentsQty() + delim +
+				method.getMathOperationsQty() + delim +
+				method.getMaxNestedBlocks() + delim +
+				method.getAnonymousClassesQty() + delim +
+				method.getSubClassesQty() + delim +
+				method.getLambdasQty() + delim +
+				method.getUniqueWordsQty();
+				nFields = line.split(delim).length;
+				if (nFields != 25) {
+					String msg = "Unusual num of fields: " + nFields + " on line " + line;
+					System.out.println(msg);
+					LOG.warn(msg);
+				}
+				methodOutput.println(line);
 
 				for(Map.Entry<String,Integer> entry : method.getVariablesUsage().entrySet()) {
 
