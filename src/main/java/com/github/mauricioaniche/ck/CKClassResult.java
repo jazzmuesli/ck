@@ -7,6 +7,7 @@ public class CKClassResult {
 	private String file;
 	private String className;
 	private String type;
+	private int modifiers;
 
 	private int dit;
 	private int wmc;
@@ -54,12 +55,12 @@ public class CKClassResult {
 	private int numberOfSynchronizedFields;
 	private String errorMessage;
 
-	public CKClassResult(String file, String className, String type) {
+	public CKClassResult(String file, String className, String type, int modifiers) {
 		this.file = file;
 		this.className = className;
 		this.type = type;
 		this.methods = new HashSet<>();
-		
+		this.modifiers = modifiers;
 	}
 	
 	public String getFile() {
@@ -440,5 +441,9 @@ public class CKClassResult {
 
 	public String getErrorMessage() {
 		return errorMessage;
+	}
+
+	public int getModifiers() {
+		return modifiers;
 	}
 }

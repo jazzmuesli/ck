@@ -4,6 +4,8 @@ import com.github.mauricioaniche.ck.CKMethodResult;
 import com.github.mauricioaniche.ck.util.JDTUtils;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jdt.core.dom.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,6 +26,8 @@ public class MethodLevelVisitor extends ASTVisitor {
 	private String currentMethodName;
 	private List<MethodLevelMetric> currentMetricsToRun;
 
+	private static final Logger LOG = LoggerFactory.getLogger(MethodLevelVisitor.class);
+	
 	public MethodLevelVisitor(Callable<List<MethodLevelMetric>> metrics, CompilationUnit cu) {
 		this.metrics = metrics;
 		this.cu = cu;
@@ -33,9 +37,14 @@ public class MethodLevelVisitor extends ASTVisitor {
 	public boolean visit(MethodDeclaration node) {
 		currentMethodName = getMethodFullName(node);
 
-		currentMethod = new CKMethodResult(currentMethodName);
-		if(methods.containsKey(currentMethodName))
-			throw new RuntimeException("Method " + currentMethodName + " already visited. This might happen when methods have same name and types only differ because of generics.");
+		currentMethod = new CKMethodResult(currentMethodName, node.getModifiers());
+		if(methods.containsKey(currentMethodName)) {
+			String msg = "Method " + currentMethodName + " already visited as " + methods.get(currentMethodName) 
+			+ " in node=" + node +". This might happen when methods have same name and types only differ because of generics.";
+			LOG.error(msg);
+			throw new RuntimeException(msg);
+		}
+			
 
 		methods.put(currentMethodName, currentMethod);
 

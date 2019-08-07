@@ -17,10 +17,10 @@ public class CSVExporter {
 	private static final Logger LOG = LoggerFactory.getLogger(CSVExporter.class);
 	private static final String VARIABLE_FIELDS = "file,class,method,variable,usage";
 	private static final String FIELD_FIELDS = "file,class,method,variable,usage";
-	private static final String METHOD_FIELDS = "file,class,method,line,cbo,wmc,rfc,loc,returns,variables,parameters,startLine," +
+	private static final String METHOD_FIELDS = "file,class,method,modifiers,line,cbo,wmc,rfc,loc,returns,variables,parameters,startLine," +
 			"loopQty,comparisonsQty,tryCatchQty,parenthesizedExpsQty,stringLiteralsQty,numbersQty,assignmentsQty," +
 			"mathOperationsQty,maxNestedBlocks,anonymousClassesQty,subClassesQty,lambdasQty,uniqueWordsQty";
-	private static final String CLASS_FIELDS = "file,class,type,cbo,wmc,dit,rfc,lcom,totalMethods,staticMethods,publicMethods,privateMethods,protectedMethods," +
+	private static final String CLASS_FIELDS = "file,class,modifiers,type,cbo,wmc,dit,rfc,lcom,totalMethods,staticMethods,publicMethods,privateMethods,protectedMethods," +
 			"defaultMethods,abstractMethods,finalMethods,synchronizedMethods,totalFields,staticFields,publicFields,privateFields," +
 			"protectedFields,defaultFields,finalFields,synchronizedFields,nosi,loc,returnQty,loopQty,comparisonsQty," +
 			"tryCatchQty,parenthesizedExpsQty,stringLiteralsQty,numbersQty,assignmentsQty,mathOperationsQty,variablesQty," +
@@ -57,10 +57,14 @@ public class CSVExporter {
 		fieldOutput.println(FIELD_FIELDS.replaceAll(",", delim));
 
 		new CK().calculate(path, result -> {
-			if(result.isError()) return;
+			if(result.isError()) {
+				LOG.info("Path " + path + " resulted in errorMessage: " + result.getErrorMessage()); 
+				return;
+			}
 
 			String cLine = result.getFile() + delim +
 			result.getClassName() + delim +
+			result.getModifiers() + delim +
 			result.getType() + delim +
 			result.getCbo() + delim +
 			result.getWmc() + delim +
@@ -102,7 +106,7 @@ public class CSVExporter {
 			result.getLambdasQty() + delim +
 			result.getUniqueWordsQty();
 			int nFields = cLine.split(delim).length;
-			if (nFields != 42) {
+			if (nFields != 43) {
 				String msg = "Unusual num of fields: " + nFields + " on line " + cLine;
 				LOG.warn(msg);
 				System.out.println(msg);
@@ -116,6 +120,7 @@ public class CSVExporter {
 				String line = result.getFile() + delim +
 				result.getClassName() + delim +
 				method.getMethodName() + delim +
+				method.getModifiers() + delim +
 				method.getStartLine() + delim +
 				method.getCbo() + delim +
 				method.getWmc() + delim +
@@ -139,7 +144,7 @@ public class CSVExporter {
 				method.getLambdasQty() + delim +
 				method.getUniqueWordsQty();
 				nFields = line.split(delim).length;
-				if (nFields != 25) {
+				if (nFields != 26) {
 					String msg = "Unusual num of fields: " + nFields + " on line " + line;
 					System.out.println(msg);
 					LOG.warn(msg);
