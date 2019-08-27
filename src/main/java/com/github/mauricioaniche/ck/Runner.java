@@ -1,10 +1,12 @@
 package com.github.mauricioaniche.ck;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import com.github.mauricioaniche.ck.util.ResultWriter;
 
 public class Runner {
 
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void main(String[] args) throws IOException {
 
 		if (args == null || args.length != 1) {
 			System.out.println("Usage java -jar ck.jar <path to project>");
@@ -12,10 +14,18 @@ public class Runner {
 		}
 
 		String path = args[0];
-		String delim = ",";
 
-		CSVExporter.processDirectory(path, delim, CSVExporter.classFileName, CSVExporter.methodFileName,
-				CSVExporter.variableFileName, CSVExporter.fieldFileName);
+		ResultWriter writer = new ResultWriter("class.csv", "method.csv", "variable.csv", "field.csv");
+		
+		new CK().calculate(path, result -> {
+			try {
+			    writer.printResult(result);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		});
+		
+		writer.flushAndClose();
 	}
 
 }
