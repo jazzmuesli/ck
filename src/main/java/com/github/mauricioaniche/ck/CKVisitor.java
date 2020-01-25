@@ -69,7 +69,8 @@ public class CKVisitor extends ASTVisitor {
 		String type = getTypeOfTheUnit(node);
 		int modifiers = node.getModifiers();
 		CKClassResult currentClass = new CKClassResult(sourceFilePath, className, type, modifiers);
-		currentClass.setLoc((int) JDTUtils.countLoc(node));
+		// exclude comments, etc
+		currentClass.setLoc(calculate(IOUtils.toInputStream(node.toString())));
 
 		// create a set of visitors, just for the current class
 		List<ClassLevelMetric> classLevelMetrics = instantiateClassLevelMetricVisitors();
